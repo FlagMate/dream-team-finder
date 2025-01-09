@@ -44,16 +44,16 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
     },
   });
 
-  // Organize filter options by type
+  // Organize filter options by type with safe fallbacks
   const cities = filterOptions
     .filter((option) => option.type === "city")
-    .map((option) => option.value);
+    .map((option) => option.value) || [];
   const industries = filterOptions
     .filter((option) => option.type === "industry")
-    .map((option) => option.value);
+    .map((option) => option.value) || [];
   const technologies = filterOptions
     .filter((option) => option.type === "technology")
-    .map((option) => option.value);
+    .map((option) => option.value) || [];
 
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
