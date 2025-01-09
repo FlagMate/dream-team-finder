@@ -23,16 +23,16 @@ interface MultiSelectProps {
 }
 
 export const MultiSelect = ({
-  options = [],
-  selected = [],
+  options,
+  selected,
   onChange,
   placeholder,
 }: MultiSelectProps) => {
   const [open, setOpen] = useState(false);
 
   // Initialize arrays with empty arrays if undefined
-  const safeOptions = Array.isArray(options) ? options : [];
-  const safeSelected = Array.isArray(selected) ? selected : [];
+  const safeOptions = options || [];
+  const safeSelected = selected || [];
 
   const handleSelect = (currentValue: string) => {
     const updatedSelection = safeSelected.includes(currentValue)
@@ -61,27 +61,21 @@ export const MultiSelect = ({
           <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandEmpty>No option found.</CommandEmpty>
           <CommandGroup>
-            {safeOptions.length > 0 ? (
-              safeOptions.map((option) => (
-                <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={() => handleSelect(option)}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      safeSelected.includes(option) ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {option}
-                </CommandItem>
-              ))
-            ) : (
-              <CommandItem value="no-options" disabled>
-                No options available
+            {safeOptions.map((option) => (
+              <CommandItem
+                key={option}
+                value={option}
+                onSelect={() => handleSelect(option)}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    safeSelected.includes(option) ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {option}
               </CommandItem>
-            )}
+            ))}
           </CommandGroup>
         </Command>
       </PopoverContent>
