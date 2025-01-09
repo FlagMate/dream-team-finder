@@ -30,7 +30,7 @@ export const MultiSelect = ({
 }: MultiSelectProps) => {
   const [open, setOpen] = useState(false);
 
-  // Initialize arrays with empty arrays if undefined
+  // Ensure we always have arrays, even if undefined is passed
   const safeOptions = Array.isArray(options) ? options : [];
   const safeSelected = Array.isArray(selected) ? selected : [];
 

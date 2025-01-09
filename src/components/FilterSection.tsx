@@ -40,28 +40,25 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
         throw error;
       }
 
-      return data as FilterOption[];
+      return (data || []) as FilterOption[];
     },
   });
 
   // Organize filter options by type with safe fallbacks
-  const cities = filterOptions
-    .filter((option) => option.type === "city")
+  const cities = filterOptions?.filter((option) => option.type === "city")
     .map((option) => option.value) || [];
-  const industries = filterOptions
-    .filter((option) => option.type === "industry")
+  const industries = filterOptions?.filter((option) => option.type === "industry")
     .map((option) => option.value) || [];
-  const technologies = filterOptions
-    .filter((option) => option.type === "technology")
+  const technologies = filterOptions?.filter((option) => option.type === "technology")
     .map((option) => option.value) || [];
 
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
       onFiltersChange({
         search,
-        cities: selectedCities,
-        industries: selectedIndustries,
-        technologies: selectedTechnologies,
+        cities: selectedCities || [],
+        industries: selectedIndustries || [],
+        technologies: selectedTechnologies || [],
       });
     }, 100);
 
