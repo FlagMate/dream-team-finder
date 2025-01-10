@@ -227,7 +227,6 @@ export type Database = {
           city: string
           created_at: string
           email: string
-          email_preferences: Json | null
           email_verified: boolean | null
           full_name: string
           github: string | null
@@ -236,7 +235,6 @@ export type Database = {
           image_url: string | null
           industries: string[] | null
           is_online: boolean | null
-          last_email_sent: string | null
           last_seen: string | null
           linkedin: string | null
           linkedin_verified: boolean | null
@@ -245,7 +243,6 @@ export type Database = {
           space: string
           tech_stack: string[]
           updated_at: string
-          verification_status: string | null
           website: string | null
           website_verified: boolean | null
         }
@@ -256,7 +253,6 @@ export type Database = {
           city?: string
           created_at?: string
           email: string
-          email_preferences?: Json | null
           email_verified?: boolean | null
           full_name: string
           github?: string | null
@@ -265,7 +261,6 @@ export type Database = {
           image_url?: string | null
           industries?: string[] | null
           is_online?: boolean | null
-          last_email_sent?: string | null
           last_seen?: string | null
           linkedin?: string | null
           linkedin_verified?: boolean | null
@@ -274,7 +269,6 @@ export type Database = {
           space?: string
           tech_stack?: string[]
           updated_at?: string
-          verification_status?: string | null
           website?: string | null
           website_verified?: boolean | null
         }
@@ -285,7 +279,6 @@ export type Database = {
           city?: string
           created_at?: string
           email?: string
-          email_preferences?: Json | null
           email_verified?: boolean | null
           full_name?: string
           github?: string | null
@@ -294,7 +287,6 @@ export type Database = {
           image_url?: string | null
           industries?: string[] | null
           is_online?: boolean | null
-          last_email_sent?: string | null
           last_seen?: string | null
           linkedin?: string | null
           linkedin_verified?: boolean | null
@@ -303,7 +295,6 @@ export type Database = {
           space?: string
           tech_stack?: string[]
           updated_at?: string
-          verification_status?: string | null
           website?: string | null
           website_verified?: boolean | null
         }
@@ -350,98 +341,12 @@ export type Database = {
           },
         ]
       }
-      user_activity_logs: {
-        Row: {
-          activity_type: string
-          created_at: string | null
-          description: string | null
-          id: string
-          metadata: Json | null
-          user_id: string | null
-        }
-        Insert: {
-          activity_type: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          metadata?: Json | null
-          user_id?: string | null
-        }
-        Update: {
-          activity_type?: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          metadata?: Json | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_activity_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_connection_history: {
-        Args: {
-          user_id: string
-        }
-        Returns: {
-          connection_id: string
-          connected_user_id: string
-          connected_user_name: string
-          connection_type: string
-          status: string
-          created_at: string
-          last_interaction: string
-        }[]
-      }
-      get_connection_metrics: {
-        Args: {
-          user_id: string
-        }
-        Returns: {
-          metric_name: string
-          metric_value: number
-        }[]
-      }
-      get_connection_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          status: string
-          count: number
-        }[]
-      }
-      get_geographic_distribution: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          city: string
-          user_count: number
-        }[]
-      }
-      get_tech_stack_distribution: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          technology: string
-          user_count: number
-        }[]
-      }
-      get_user_growth_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          date: string
-          new_users: number
-          total_users: number
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       admin_role: "super_admin" | "admin"
