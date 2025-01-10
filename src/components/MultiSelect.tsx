@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface MultiSelectProps {
   options: string[];
@@ -61,18 +62,17 @@ export const MultiSelect = ({
           <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandEmpty>No option found.</CommandEmpty>
           {safeOptions.length > 0 ? (
-            <CommandGroup>
+            <CommandGroup className="max-h-64 overflow-auto">
               {safeOptions.map((option) => (
                 <CommandItem
                   key={option}
                   value={option}
                   onSelect={() => handleSelect(option)}
+                  className="flex items-center gap-2"
                 >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      safeSelected.includes(option) ? "opacity-100" : "opacity-0"
-                    )}
+                  <Checkbox
+                    checked={safeSelected.includes(option)}
+                    className="h-4 w-4"
                   />
                   {option}
                 </CommandItem>

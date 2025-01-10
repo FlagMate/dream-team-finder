@@ -47,11 +47,14 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
   });
 
   // Organize filter options by type with safe fallbacks
-  const cities = filterOptions?.filter((option) => option.type === "city")
+  const cities = filterOptions
+    ?.filter((option) => option.type === "city")
     .map((option) => option.value) || [];
-  const industries = filterOptions?.filter((option) => option.type === "industry")
+  const industries = filterOptions
+    ?.filter((option) => option.type === "industry")
     .map((option) => option.value) || [];
-  const technologies = filterOptions?.filter((option) => option.type === "technology")
+  const technologies = filterOptions
+    ?.filter((option) => option.type === "technology")
     .map((option) => option.value) || [];
 
   useEffect(() => {
@@ -62,7 +65,7 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
         industries: selectedIndustries || [],
         technologies: selectedTechnologies || [],
       });
-    }, 300); // Increased debounce time for better performance
+    }, 300);
 
     return () => clearTimeout(debounceTimeout);
   }, [search, selectedCities, selectedIndustries, selectedTechnologies, onFiltersChange]);
