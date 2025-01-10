@@ -65,28 +65,42 @@ export const DiscoverSection = () => {
             )
           `);
 
+        // Build filter conditions
+        const filterConditions = [];
+
         // Apply search filter
         if (filters.search) {
-          query = query.or(`full_name.ilike.%${filters.search}%,role.ilike.%${filters.search}%`);
+          filterConditions.push(`full_name.ilike.%${filters.search}%`);
+          filterConditions.push(`role.ilike.%${filters.search}%`);
         }
 
-        // Apply city filter
+        // Apply city filter (single city per profile)
         if (filters.cities.length > 0) {
-          query = query.in('city', filters.cities);
+          filterConditions.push(`city.in.(${filters.cities.map(city => `'${city}'`).join(',')})`);
         }
 
-        // Apply industry filter
+        // Apply industry filter (multiple industries possible)
         if (filters.industries.length > 0) {
-          query = query.in('space', filters.industries);
+          filterConditions.push(`space.in.(${filters.industries.map(industry => `'${industry}'`).join(',')})`);
         }
 
-        // Apply technology filter
+        // Apply technology filter (multiple technologies possible)
         if (filters.technologies.length > 0) {
-          query = query.contains('tech_stack', filters.technologies);
+          const techConditions = filters.technologies.map(tech => 
+            `tech_stack.cs.{${tech}}`
+          );
+          filterConditions.push(`(${techConditions.join(' or ')})`);
+        }
+
+        // Combine all conditions with OR
+        if (filterConditions.length > 0) {
+          query = query.or(filterConditions.join(','));
         }
 
         // Don't show the current user in the list
         query = query.neq('id', session.user.id);
+
+        console.log('Query filters:', filterConditions); // Debug log
 
         const { data: foundersData, error } = await query;
 
@@ -94,6 +108,8 @@ export const DiscoverSection = () => {
           console.error("Error fetching founders:", error);
           throw error;
         }
+
+        console.log('Fetched founders:', foundersData); // Debug log
 
         return (foundersData || []).map(founder => ({
           ...founder,
@@ -116,6 +132,7 @@ export const DiscoverSection = () => {
   const { createConnection, cancelConnection } = useConnectionMutations();
 
   const handleFiltersChange = useCallback((newFilters: Filters) => {
+    console.log('Applying filters:', newFilters); // Debug log
     setFilters(newFilters);
   }, []);
 
