@@ -60,23 +60,31 @@ export const MultiSelect = ({
         <Command>
           <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandEmpty>No option found.</CommandEmpty>
-          <CommandGroup>
-            {safeOptions.map((option) => (
-              <CommandItem
-                key={option}
-                value={option}
-                onSelect={() => handleSelect(option)}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    safeSelected.includes(option) ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {option}
+          {safeOptions.length > 0 ? (
+            <CommandGroup>
+              {safeOptions.map((option) => (
+                <CommandItem
+                  key={option}
+                  value={option}
+                  onSelect={() => handleSelect(option)}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      safeSelected.includes(option) ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {option}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ) : (
+            <CommandGroup>
+              <CommandItem value="no-options" disabled>
+                No options available
               </CommandItem>
-            ))}
-          </CommandGroup>
+            </CommandGroup>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
