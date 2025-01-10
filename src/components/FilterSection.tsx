@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { MultiSelect } from "./MultiSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { SearchInput } from "./filters/SearchInput";
+import { FilterGroup } from "./filters/FilterGroup";
+import { LoadingState } from "./filters/LoadingState";
+import { ErrorState } from "./filters/ErrorState";
 
 interface FilterSectionProps {
   onFiltersChange: (filters: {
@@ -46,7 +46,6 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
     },
   });
 
-  // Organize filter options by type with safe fallbacks
   const cities = filterOptions
     ?.filter((option) => option.type === "city")
     .map((option) => option.value) || [];
@@ -71,24 +70,13 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
   }, [search, selectedCities, selectedIndustries, selectedTechnologies, onFiltersChange]);
 
   if (error) {
-    return (
-      <div className="w-full p-6 bg-red-50 rounded-lg text-red-600">
-        Error loading filters. Please try again later.
-      </div>
-    );
+    return <ErrorState />;
   }
 
   if (isLoading) {
     return (
       <div className="w-full p-6 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-lg">
-        <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-          </div>
-        </div>
+        <LoadingState />
       </div>
     );
   }
@@ -96,38 +84,18 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
   return (
     <div className="w-full p-6 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 rounded-lg">
       <div className="flex flex-col gap-4">
-        <div className="relative">
-          <Input
-            placeholder="Search founders..."
-            className="pl-10 bg-white/80 backdrop-blur-sm"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <MultiSelect
-            options={cities}
-            selected={selectedCities}
-            onChange={setSelectedCities}
-            placeholder="Select Cities"
-          />
-
-          <MultiSelect
-            options={industries}
-            selected={selectedIndustries}
-            onChange={setSelectedIndustries}
-            placeholder="Select Industries"
-          />
-
-          <MultiSelect
-            options={technologies}
-            selected={selectedTechnologies}
-            onChange={setSelectedTechnologies}
-            placeholder="Select Technologies"
-          />
-        </div>
+        <SearchInput value={search} onChange={setSearch} />
+        <FilterGroup
+          cities={cities}
+          industries={industries}
+          technologies={technologies}
+          selectedCities={selectedCities}
+          selectedIndustries={selectedIndustries}
+          selectedTechnologies={selectedTechnologies}
+          onCitiesChange={setSelectedCities}
+          onIndustriesChange={setSelectedIndustries}
+          onTechnologiesChange={setSelectedTechnologies}
+        />
       </div>
     </div>
   );
