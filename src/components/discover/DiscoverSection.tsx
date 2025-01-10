@@ -1,7 +1,7 @@
 import { FounderCard } from "@/components/FounderCard";
 import { FilterSection } from "@/components/FilterSection";
 import { useConnectionMutations } from "@/hooks/useConnectionMutations";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSessionContext } from '@supabase/auth-helpers-react';
@@ -24,33 +24,10 @@ export const DiscoverSection = () => {
     technologies: [],
   });
 
-  // Subscribe to real-time connection updates
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    const channel = supabase
-      .channel('connection_changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'connections',
-        filter: `sender_id=eq.${session.user.id}`,
-      }, () => {
-        queryClient.invalidateQueries({ queryKey: ['founders'] });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [session?.user?.id, queryClient]);
-
   const { data: founders = [], isLoading, error } = useQuery({
     queryKey: ["founders", filters],
     queryFn: async () => {
-      if (!session?.user?.id) {
-        return [];
-      }
+      if (!session?.user?.id) return [];
 
       try {
         let query = supabase
@@ -65,42 +42,44 @@ export const DiscoverSection = () => {
             )
           `);
 
-        // Build filter conditions
+        // Build filter conditions array
         const filterConditions = [];
 
-        // Apply search filter
+        // Search filter (name or role)
         if (filters.search) {
-          filterConditions.push(`full_name.ilike.%${filters.search}%`);
-          filterConditions.push(`role.ilike.%${filters.search}%`);
+          filterConditions.push(`(full_name.ilike.%${filters.search}% OR role.ilike.%${filters.search}%)`);
         }
 
-        // Apply city filter (single city per profile)
+        // City filter (single city per profile)
         if (filters.cities.length > 0) {
           filterConditions.push(`city.in.(${filters.cities.map(city => `'${city}'`).join(',')})`);
         }
 
-        // Apply industry filter (multiple industries possible)
+        // Industry filter (multiple industries possible)
         if (filters.industries.length > 0) {
-          filterConditions.push(`space.in.(${filters.industries.map(industry => `'${industry}'`).join(',')})`);
+          const industryConditions = filters.industries.map(industry => 
+            `industries ?| array['${industry}']`
+          );
+          filterConditions.push(`(${industryConditions.join(' OR ')})`);
         }
 
-        // Apply technology filter (multiple technologies possible)
+        // Technology filter (multiple technologies possible)
         if (filters.technologies.length > 0) {
           const techConditions = filters.technologies.map(tech => 
-            `tech_stack.cs.{${tech}}`
+            `tech_stack ?| array['${tech}']`
           );
-          filterConditions.push(`(${techConditions.join(' or ')})`);
+          filterConditions.push(`(${techConditions.join(' OR ')})`);
         }
 
-        // Combine all conditions with OR
+        // Combine all conditions with OR operator
         if (filterConditions.length > 0) {
           query = query.or(filterConditions.join(','));
         }
 
-        // Don't show the current user in the list
+        // Don't show the current user
         query = query.neq('id', session.user.id);
 
-        console.log('Query filters:', filterConditions); // Debug log
+        console.log('Filter conditions:', filterConditions);
 
         const { data: foundersData, error } = await query;
 
@@ -109,7 +88,7 @@ export const DiscoverSection = () => {
           throw error;
         }
 
-        console.log('Fetched founders:', foundersData); // Debug log
+        console.log('Fetched founders:', foundersData);
 
         return (foundersData || []).map(founder => ({
           ...founder,
@@ -126,13 +105,12 @@ export const DiscoverSection = () => {
       }
     },
     enabled: !!session?.user?.id,
-    retry: 1,
   });
 
   const { createConnection, cancelConnection } = useConnectionMutations();
 
   const handleFiltersChange = useCallback((newFilters: Filters) => {
-    console.log('Applying filters:', newFilters); // Debug log
+    console.log('Applying filters:', newFilters);
     setFilters(newFilters);
   }, []);
 
