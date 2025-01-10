@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { MultiSelect } from "./MultiSelect";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface FilterSectionProps {
   onFiltersChange: (filters: {
@@ -27,7 +28,7 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>([]);
 
-  const { data: filterOptions = [], isLoading } = useQuery({
+  const { data: filterOptions = [], isLoading, error } = useQuery({
     queryKey: ["filterOptions"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -37,7 +38,8 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
 
       if (error) {
         console.error("Error fetching filter options:", error);
-        throw error;
+        toast.error("Failed to load filter options");
+        return [];
       }
 
       return (data || []) as FilterOption[];
@@ -60,10 +62,18 @@ export const FilterSection = ({ onFiltersChange }: FilterSectionProps) => {
         industries: selectedIndustries || [],
         technologies: selectedTechnologies || [],
       });
-    }, 100);
+    }, 300); // Increased debounce time for better performance
 
     return () => clearTimeout(debounceTimeout);
   }, [search, selectedCities, selectedIndustries, selectedTechnologies, onFiltersChange]);
+
+  if (error) {
+    return (
+      <div className="w-full p-6 bg-red-50 rounded-lg text-red-600">
+        Error loading filters. Please try again later.
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
