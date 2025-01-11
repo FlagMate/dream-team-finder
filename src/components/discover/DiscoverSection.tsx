@@ -6,6 +6,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSessionContext } from '@supabase/auth-helpers-react';
 import { toast } from "sonner";
+import { Toggle } from "@/components/ui/toggle";
+import { LayoutGrid, List } from "lucide-react";
+import { FounderListItem } from "@/components/discover/FounderListItem";
 
 interface Filters {
   search: string;
@@ -17,6 +20,7 @@ interface Filters {
 export const DiscoverSection = () => {
   const { session } = useSessionContext();
   const queryClient = useQueryClient();
+  const [isGridView, setIsGridView] = useState(true);
   const [filters, setFilters] = useState<Filters>({
     search: "",
     cities: [],
@@ -137,36 +141,91 @@ export const DiscoverSection = () => {
 
   return (
     <>
-      <FilterSection onFiltersChange={handleFiltersChange} />
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="flex justify-between items-center mb-8">
+        <FilterSection onFiltersChange={handleFiltersChange} />
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">View:</span>
+          <Toggle
+            pressed={isGridView}
+            onPressedChange={setIsGridView}
+            aria-label="Toggle view"
+            className="data-[state=on]:bg-primary"
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Toggle>
+          <Toggle
+            pressed={!isGridView}
+            onPressedChange={(pressed) => setIsGridView(!pressed)}
+            aria-label="Toggle view"
+            className="data-[state=on]:bg-primary"
+          >
+            <List className="h-4 w-4" />
+          </Toggle>
+        </div>
+      </div>
+
+      <div className={isGridView 
+        ? "mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        : "mt-12 flex flex-col gap-4"
+      }>
         {founders.map((founder) => (
-          <FounderCard
-            key={founder.id}
-            id={founder.id}
-            name={founder.full_name}
-            role={founder.role}
-            city={founder.city}
-            techStack={founder.tech_stack || []}
-            industry={founder.space}
-            imageUrl={founder.image_url || "https://via.placeholder.com/150"}
-            isConnected={founder.isConnected}
-            isPendingConnection={founder.isPendingConnection}
-            onConnect={async () => {
-              await toast.promise(createConnection(founder.id), {
-                loading: 'Sending connection request...',
-                success: 'Connection request sent!',
-                error: 'Failed to send connection request'
-              });
-            }}
-            onCancelRequest={async () => {
-              await toast.promise(cancelConnection(founder.id), {
-                loading: 'Canceling request...',
-                success: 'Connection request canceled',
-                error: 'Failed to cancel request'
-              });
-            }}
-            bio={founder.bio}
-          />
+          isGridView ? (
+            <FounderCard
+              key={founder.id}
+              id={founder.id}
+              name={founder.full_name}
+              role={founder.role}
+              city={founder.city}
+              techStack={founder.tech_stack || []}
+              industry={founder.space}
+              imageUrl={founder.image_url || "https://via.placeholder.com/150"}
+              isConnected={founder.isConnected}
+              isPendingConnection={founder.isPendingConnection}
+              onConnect={async () => {
+                await toast.promise(createConnection(founder.id), {
+                  loading: 'Sending connection request...',
+                  success: 'Connection request sent!',
+                  error: 'Failed to send connection request'
+                });
+              }}
+              onCancelRequest={async () => {
+                await toast.promise(cancelConnection(founder.id), {
+                  loading: 'Canceling request...',
+                  success: 'Connection request canceled',
+                  error: 'Failed to cancel request'
+                });
+              }}
+              bio={founder.bio}
+            />
+          ) : (
+            <FounderListItem
+              key={founder.id}
+              id={founder.id}
+              name={founder.full_name}
+              role={founder.role}
+              city={founder.city}
+              techStack={founder.tech_stack || []}
+              industry={founder.space}
+              imageUrl={founder.image_url || "https://via.placeholder.com/150"}
+              isConnected={founder.isConnected}
+              isPendingConnection={founder.isPendingConnection}
+              onConnect={async () => {
+                await toast.promise(createConnection(founder.id), {
+                  loading: 'Sending connection request...',
+                  success: 'Connection request sent!',
+                  error: 'Failed to send connection request'
+                });
+              }}
+              onCancelRequest={async () => {
+                await toast.promise(cancelConnection(founder.id), {
+                  loading: 'Canceling request...',
+                  success: 'Connection request canceled',
+                  error: 'Failed to cancel request'
+                });
+              }}
+              bio={founder.bio}
+            />
+          )
         ))}
       </div>
     </>
