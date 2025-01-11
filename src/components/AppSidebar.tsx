@@ -1,22 +1,26 @@
-import { Compass, UserPlus, Users } from "lucide-react";
+import { Compass, Home, UserPlus, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
 interface AppSidebarProps {
-  activeTab: 'discover' | 'requests' | 'connections';
-  onTabChange: (tab: 'discover' | 'requests' | 'connections') => void;
+  activeTab: 'home' | 'discover' | 'requests' | 'connections';
+  onTabChange: (tab: 'home' | 'discover' | 'requests' | 'connections') => void;
 }
 
 export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
   const items = [
+    {
+      title: "Home",
+      value: "home" as const,
+      icon: Home,
+    },
     {
       title: "Discover",
       value: "discover" as const,
