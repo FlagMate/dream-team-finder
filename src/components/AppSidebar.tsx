@@ -36,9 +36,23 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
 
   return (
     <Sidebar>
-      <SidebarContent>
+      {/* Branding Area */}
+      <div className="p-6 border-b border-border">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-lg">CF</span>
+          </div>
+          <div className="flex flex-col">
+            <h1 className="font-bold text-lg bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              CoFounder
+            </h1>
+            <p className="text-xs text-muted-foreground">Find Your Match</p>
+          </div>
+        </div>
+      </div>
+
+      <SidebarContent className="pt-4">
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
